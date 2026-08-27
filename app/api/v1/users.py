@@ -1,0 +1,20 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.dependency import get_db
+from app.models import User
+from app.schemas import UserRequest, UserResponse
+from app.service import users as users_servise
+from app.dependency import get_current_user
+
+
+router = APIRouter()
+
+@router.post("/users", response_model=UserResponse)
+def create_user(paylaod: UserRequest, db: Session = Depends(get_db)):
+    return users_servise.create_user(db, paylaod.login)
+
+@router.get(".users/me", response_model=UserResponse)
+def get_current_user(current_user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(current_user)
+    
